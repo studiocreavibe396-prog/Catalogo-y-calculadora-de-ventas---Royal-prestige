@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Royal Prestige · Catálogo y Calculadora de Crédito</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #f4f7fc;
+      font-family: system-ui, 'Segoe UI', 'Inter', -apple-system, BlinkMacSystemFont, 'Roboto', sans-serif;
+      color: #1a2c3e;
+      padding: 1rem;
+      line-height: 1.4;
+    }
+
+    /* Contenedor principal */
+    .app-container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    /* Header */
+    .header {
+      margin-bottom: 2rem;
+      text-align: center;
+    }
+
+    .header h1 {
+      font-size: 1.8rem;
+      font-weight: 600;
+      background: linear-gradient(135deg, #1e4668, #0f2c44);
+      background-clip: text;
+      -webkit-background-clip: text;
+      color: transparent;
+      letter-spacing: -0.3px;
+    }
+
+    .header p {
+      color: #4a627a;
+      margin-top: 0.3rem;
+      font-size: 0.9rem;
+    }
+
+    /* Buscador */
+    .search-section {
+      margin-bottom: 2rem;
+      position: relative;
+    }
+
+    .search-box {
+      width: 100%;
+      padding: 0.9rem 1.2rem;
+      font-size: 1rem;
+      border: 1px solid #cfdfed;
+      border-radius: 60px;
+      background: white;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.02), 0 1px 2px rgba(0,0,0,0.05);
+      transition: all 0.2s ease;
+      outline: none;
+      font-weight: 500;
+    }
+
+    .search-box:focus {
+      border-color: #2c7da0;
+      box-shadow: 0 4px 12px rgba(44,125,160,0.1);
+    }
+
+    .result-count {
+      margin-top: 0.6rem;
+      font-size: 0.85rem;
+      color: #2c7da0;
+      font-weight: 500;
+      padding-left: 0.5rem;
+    }
+
+    /* Grid de tarjetas */
+    .products-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.3rem;
+      margin-bottom: 2rem;
+    }
+
+    @media (min-width: 640px) {
+      .products-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (min-width: 1024px) {
+      .products-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    /* Tarjeta producto */
+    .product-card {
+      background: white;
+      border-radius: 1.5rem;
+      overflow: hidden;
+      transition: all 0.2s ease;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.02), 0 2px 6px rgba(0,0,0,0.05);
+      border: 1px solid #e2edf2;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .product-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 16px 28px rgba(0,0,0,0.08);
+      border-color: #cbdde8;
+    }
+
+    .card-content {
+      padding: 1.25rem 1.2rem 1.2rem;
+    }
+
+    .product-code {
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #2c7da0;
+      background: #eaf4f9;
+      display: inline-block;
+      padding: 0.2rem 0.7rem;
+      border-radius: 30px;
+      margin-bottom: 0.7rem;
+    }
+
+    .product-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      line-height: 1.3;
+      color: #0f2c3f;
+    }
+
+    .product-category {
+      font-size: 0.75rem;
+      color: #5d7a96;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+
+    .price-contado {
+      font-size: 1.65rem;
+      font-weight: 800;
+      color: #1e4668;
+      margin: 0.5rem 0 0.2rem;
+      letter-spacing: -0.5px;
+    }
+
+    .price-contado small {
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: #5584a0;
+    }
+
+    .btn-simular {
+      margin-top: 1rem;
+      background: #f0f4f9;
+      border: none;
+      width: 100%;
+      padding: 0.7rem;
+      border-radius: 40px;
+      font-weight: 600;
+      font-size: 0.85rem;
+      color: #1e5a7a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: 0.2s;
+      cursor: pointer;
+    }
+
+    .btn-simular:hover {
+      background: #e2edf5;
+      color: #0a405c;
+    }
+
+    /* Modal */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.65);
+      backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      visibility: hidden;
+      opacity: 0;
+      transition: opacity 0.2s ease, visibility 0s linear 0.2s;
+      padding: 1rem;
+    }
+
+    .modal-overlay.active {
+      visibility: visible;
+      opacity: 1;
+      transition: opacity 0.2s ease;
+    }
+
+    .modal-container {
+      background: white;
+      max-width: 650px;
+      width: 100%;
+      max-height: 90vh;
+      border-radius: 2rem;
+      overflow-y: auto;
+      box-shadow: 0 30px 40px rgba(0,0,0,0.2);
+      animation: modalFadeIn 0.25s ease;
+    }
+
+    @keyframes modalFadeIn {
+      from {
+        opacity: 0;
+        transform: scale(0.97);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    .modal-header {
+      padding: 1.5rem 1.5rem 0.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #e9f0f3;
+    }
+
+    .modal-header h2 {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: #0f2c3f;
+    }
+
+    .close-modal {
+      background: none;
+      border: none;
+      font-size: 1.8rem;
+      cursor: pointer;
+      color: #7f9ab3;
+      transition: 0.1s;
+      line-height: 1;
+    }
+
+    .modal-body {
+      padding: 1.5rem;
+    }
+
+    .credit-detail {
+      background: #f8fafd;
+      border-radius: 1.2rem;
+      padding: 1rem;
+      margin-bottom: 1.2rem;
+      border-left: 4px solid #2c7da0;
+    }
+
+    .finance-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      flex-wrap: wrap;
+      margin: 0.5rem 0;
+      font-size: 0.95rem;
+    }
+
+    .badge-min {
+      background: #ffe6dc;
+      color: #b45116;
+      font-size: 0.7rem;
+      font-weight: 600;
+      border-radius: 30px;
+      padding: 0.2rem 0.7rem;
+      display: inline-block;
+      margin-left: 0.5rem;
+    }
+
+    .interes-highlight {
+      color: #b13e3e;
+      font-weight: 600;
+    }
+
+    .policy-note {
+      background: #eef3fc;
+      border-radius: 1rem;
+      padding: 0.9rem;
+      margin-top: 1rem;
+      font-size: 0.8rem;
+      text-align: center;
+      color: #1c5879;
+      font-weight: 500;
+    }
+
+    hr {
+      margin: 1rem 0;
+      border-color: #e0ecf2;
+    }
+
+    .text-muted {
+      color: #5f7f9a;
+      font-size: 0.8rem;
+    }
+
+    .fw-bold {
+      font-weight: 700;
+    }
+  </style>
+</head>
+<body>
+<div class="app-container">
+  <div class="header">
+    <h1>Royal Prestige 2026</h1>
+    <p>Catálogo inteligente · Simulación de crédito con cuota mínima garantizada</p>
+  </div>
+
+  <div class="search-section">
+    <input type="text" id="searchInput" class="search-box" placeholder="🔍 Buscar por nombre, código o categoría... (ej: olla, esencial, CO4606)">
+    <div class="result-count" id="resultCount">Mostrando todos los productos</div>
+  </div>
+
+  <div id="productsContainer" class="products-grid"></div>
+</div>
+
+<!-- Modal detalle crédito -->
+<div id="productModal" class="modal-overlay">
+  <div class="modal-container">
+    <div class="modal-header">
+      <h2 id="modalTitle">Detalle de crédito</h2>
+      <button class="close-modal" id="closeModalBtn">&times;</button>
+    </div>
+    <div class="modal-body" id="modalBody">
+      <!-- Contenido dinámico -->
+    </div>
+  </div>
+</div>
+
+<script>
+  // ----------------------------- DATOS DE PRODUCTOS (extraídos de la tabla 2026) -----------------------------
+  // Categorías manuales según el CSV
+  const rawProductsData = [
+    // SISTEMAS DE COCINA
+    { codigo: "CO4606", descripcion: "SC Esencial 5pz c/Recet & Rshine", precioTotal: 7139000, anticipo: 356950, cuota12: 640226, cuota18: 451685, cuota26: 339103, categoria: "Sistemas de Cocina" },
+    { codigo: "CO4616", descripcion: "SC Complement 5pz c/Recet & Rshine", precioTotal: 8699000, anticipo: 434950, cuota12: 780126, cuota18: 550386, cuota26: 413203, categoria: "Sistemas de Cocina" },
+    { codigo: "CO4626", descripcion: "SC Clásico 7pz c/Recet & Rshine", precioTotal: 10599000, anticipo: 529950, cuota12: 950518, cuota18: 670599, cuota26: 503453, categoria: "Sistemas de Cocina" },
+    { codigo: "CO4636", descripcion: "SC Especial 8pz c/Recet & Rshine", precioTotal: 13899000, anticipo: 694950, cuota12: 1246462, cuota18: 879390, cuota26: 660203, categoria: "Sistemas de Cocina" },
+    { codigo: "CO4646", descripcion: "SC Familiar 10pz c/Recet & Rshine", precioTotal: 16399000, anticipo: 819950, cuota12: 1470662, cuota18: 1037565, cuota26: 778953, categoria: "Sistemas de Cocina" },
+    { codigo: "CO4656", descripcion: "SC Profesional 15pz c/Rect & Rshine", precioTotal: 24359000, anticipo: 1217950, cuota12: 2184515, cuota18: 1541194, cuota26: 1157053, categoria: "Sistemas de Cocina" },
+    // OLLAS A PRESIÓN
+    { codigo: "CO1451", descripcion: "Olla de Presión - 6L", precioTotal: 5359000, anticipo: 267950, cuota12: 480595, cuota18: 339064, cuota26: 254553, categoria: "Ollas a Presión" },
+    { codigo: "CO1455", descripcion: "Olla de Presión - 10L", precioTotal: 6299000, anticipo: 314950, cuota12: 564894, cuota18: 398538, cuota26: 299203, categoria: "Ollas a Presión" },
+    { codigo: "PR6100", descripcion: "Tapa Olla Presión Upgrade", precioTotal: 1999000, anticipo: 99950, cuota12: 179270, cuota18: 126477, cuota26: 94953, categoria: "Ollas a Presión" },
+    // OLLAS INDIVIDUALES
+    { codigo: "CO4715", descripcion: "Olla 4 Qt/20cm con Tapa", precioTotal: 3259000, anticipo: 162950, cuota12: 292267, cuota18: 206197, cuota26: 154803, categoria: "Ollas Individuales" },
+    { codigo: "CO4725", descripcion: "Olla 8 Qt/26cm con Tapa", precioTotal: 4199000, anticipo: 209950, cuota12: 376566, cuota18: 265671, cuota26: 199453, categoria: "Ollas Individuales" },
+    { codigo: "CO9660", descripcion: "Olla 12 Qt/30cm con Tapa", precioTotal: 4519000, anticipo: 225950, cuota12: 405264, cuota18: 285917, cuota26: 214653, categoria: "Ollas Individuales" },
+    { codigo: "CO9675", descripcion: "Olla 20 Qt/35cm con Tapa", precioTotal: 5359000, anticipo: 267950, cuota12: 480595, cuota18: 339064, cuota26: 254553, categoria: "Ollas Individuales" },
+    // SARTENES Y PLANCHAS
+    { codigo: "CO4650", descripcion: "Juego Sartenes Gourmet 4pz", precioTotal: 5985000, anticipo: 299250, cuota12: 536735, cuota18: 378671, cuota26: 284288, categoria: "Sartenes y Planchas" },
+    { codigo: "CO4745", descripcion: "Sartén Gourmet 8\"/20cm c/Tapa", precioTotal: 2729000, anticipo: 136450, cuota12: 244737, cuota18: 172664, cuota26: 129628, categoria: "Sartenes y Planchas" },
+    { codigo: "CO4750", descripcion: "Sartén Gourmet 10\"/24cm c/Tapa", precioTotal: 3359000, anticipo: 167950, cuota12: 301235, cuota18: 212524, cuota26: 159553, categoria: "Sartenes y Planchas" },
+    { codigo: "CO9685", descripcion: "Plancha Doble 18\"x10\"", precioTotal: 3149000, anticipo: 157450, cuota12: 282402, cuota18: 199237, cuota26: 149578, categoria: "Sartenes y Planchas" },
+    // EXTRACTORES Y BARISTA
+    { codigo: "ES4200", descripcion: "Power Blender c/Batidor", precioTotal: 4199000, anticipo: 209950, cuota12: 376566, cuota18: 265671, cuota26: 199453, categoria: "Extractores y Barista" },
+    { codigo: "CO0902", descripcion: "Royal Prestige Expertea", precioTotal: 4099000, anticipo: 204950, cuota12: 367598, cuota18: 259344, cuota26: 194703, categoria: "Extractores y Barista" },
+    { codigo: "CO2106", descripcion: "Royal Prestige Barista", precioTotal: 3679000, anticipo: 183950, cuota12: 329933, cuota18: 232770, cuota26: 174753, categoria: "Extractores y Barista" },
+    // FILTRACIÓN DE AGUA Y AIRE
+    { codigo: "WF1210", descripcion: "FrescaFlow & Mineralizador", precioTotal: 16799000, anticipo: 839950, cuota12: 1506534, cuota18: 1062873, cuota26: 797953, categoria: "Filtración de Agua y Aire" },
+    { codigo: "WF0419", descripcion: "Filtro FrescaPure 3500 CT", precioTotal: 5989000, anticipo: 299450, cuota12: 537094, cuota18: 378924, cuota26: 284478, categoria: "Filtración de Agua y Aire" },
+    { codigo: "AP2004", descripcion: "Paquete Reemplazo Earth+", precioTotal: 2399000, anticipo: 119950, cuota12: 215142, cuota18: 151785, cuota26: 113953, categoria: "Filtración de Agua y Aire" }
+  ];
+
+  // Constante de cuota mínima garantizada según política empresa
+  const MIN_CUOTA_GARANTIZADA = 143000;
+
+  // Formateador moneda CLP
+  const formatCLP = (value) => {
+    return new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', minimumFractionDigits: 0 }).format(value);
+  };
+
+  // Función que aplica regla de cuota mínima y retorna objeto con cuota final, si fue ajustada y cuota original
+  const ajustarCuota = (cuotaOriginal, plazoMeses) => {
+    if (cuotaOriginal < MIN_CUOTA_GARANTIZADA) {
+      return { cuotaFinal: MIN_CUOTA_GARANTIZADA, ajustado: true, cuotaOriginal };
+    }
+    return { cuotaFinal: cuotaOriginal, ajustado: false, cuotaOriginal };
+  };
+
+  // Generar detalle para cada plazo (12, 18, 26)
+  const generarDetallePlazo = (producto, plazo, cuotaOriginal) => {
+    const { cuotaFinal, ajustado, cuotaOriginal: orig } = ajustarCuota(cuotaOriginal, plazo);
+    const anticipoVal = producto.anticipo;
+    const totalCredito = anticipoVal + (cuotaFinal * plazo);
+    const interesIncluido = totalCredito - producto.precioTotal;
+    return {
+      plazo,
+      cuotaMensual: cuotaFinal,
+      cuotaOriginalMostrar: ajustado ? orig : null,
+      ajustado,
+      totalAprox: totalCredito,
+      interes: interesIncluido
+    };
+  };
+
+  // Generar HTML para el modal con el desglose completo (exactamente como ejemplo solicitado)
+  const renderModalContent = (producto) => {
+    const saldoFinanciar = producto.precioTotal - producto.anticipo;
+    const detalle12 = generarDetallePlazo(producto, 12, producto.cuota12);
+    const detalle18 = generarDetallePlazo(producto, 18, producto.cuota18);
+    const detalle26 = generarDetallePlazo(producto, 26, producto.cuota26);
+
+    return `
+      <div style="margin-bottom: 1rem;">
+        <div style="font-size: 0.85rem; color: #2c7da0; font-weight: 600;">${producto.codigo} · ${producto.categoria}</div>
+        <div style="font-size: 1.6rem; font-weight: 800; margin: 0.5rem 0 0.2rem;">${producto.descripcion}</div>
+      </div>
+      
+      <div class="credit-detail">
+        <div class="finance-row"><span>💰 Precio de contado</span><span class="fw-bold">${formatCLP(producto.precioTotal)}</span></div>
+        <div class="finance-row"><span>💵 Anticipo (5%)</span><span>${formatCLP(producto.anticipo)}</span></div>
+        <div class="finance-row"><span>📉 Saldo a financiar</span><span>${formatCLP(saldoFinanciar)}</span></div>
+      </div>
+
+      <div style="font-weight: 700; margin: 1rem 0 0.5rem;">📆 Opciones de crédito</div>
+
+      <!-- Plazo 12 meses -->
+      <div class="credit-detail">
+        <div class="finance-row"><span>🏷️ Plazo 12 meses</span><span class="fw-bold">Cuota Mensual ${formatCLP(detalle12.cuotaMensual)}</span></div>
+        ${detalle12.ajustado ? `<div class="finance-row text-muted"><span>📌 Cuota original según tabla</span><span>${formatCLP(detalle12.cuotaOriginalMostrar)}</span><span class="badge-min">Ajuste x cuota mínima</span></div>` : `<div class="finance-row text-muted"><span>📌 Cuota original según tabla</span><span>${formatCLP(detalle12.cuotaOriginalMostrar || detalle12.cuotaMensual)}</span></div>`}
+        <div class="finance-row"><span>💰 Total aproximado:</span><span>${formatCLP(detalle12.totalAprox)} <span style="font-size:0.75rem;">(anticipo + 12 cuotas)</span></span></div>
+        <div class="finance-row interes-highlight"><span>💸 Interés incluido:</span><span>+${formatCLP(detalle12.interes)} sobre contado</span></div>
+      </div>
+
+      <!-- Plazo 18 meses -->
+      <div class="credit-detail">
+        <div class="finance-row"><span>🏷️ Plazo 18 meses</span><span class="fw-bold">Cuota Mensual ${formatCLP(detalle18.cuotaMensual)}</span></div>
+        ${detalle18.ajustado ? `<div class="finance-row text-muted"><span>📌 Cuota original según tabla</span><span>${formatCLP(detalle18.cuotaOriginalMostrar)}</span><span class="badge-min">Ajuste x cuota mínima</span></div>` : `<div class="finance-row text-muted"><span>📌 Cuota original según tabla</span><span>${formatCLP(detalle18.cuotaOriginalMostrar || detalle18.cuotaMensual)}</span></div>`}
+        <div class="finance-row"><span>💰 Total aproximado:</span><span>${formatCLP(detalle18.totalAprox)} <span style="font-size:0.75rem;">(anticipo + 18 cuotas)</span></span></div>
+        <div class="finance-row interes-highlight"><span>💸 Interés incluido:</span><span>+${formatCLP(detalle18.interes)} sobre contado</span></div>
+      </div>
+
+      <!-- Plazo 26 meses -->
+      <div class="credit-detail">
+        <div class="finance-row"><span>🏷️ Plazo 26 meses</span><span class="fw-bold">Cuota Mensual ${formatCLP(detalle26.cuotaMensual)}</span></div>
+        ${detalle26.ajustado ? `<div class="finance-row text-muted"><span>📌 Cuota original según tabla</span><span>${formatCLP(detalle26.cuotaOriginalMostrar)}</span><span class="badge-min">Ajuste x cuota mínima</span></div>` : `<div class="finance-row text-muted"><span>📌 Cuota original según tabla</span><span>${formatCLP(detalle26.cuotaOriginalMostrar || detalle26.cuotaMensual)}</span></div>`}
+        <div class="finance-row"><span>💰 Total aproximado:</span><span>${formatCLP(detalle26.totalAprox)} <span style="font-size:0.75rem;">(anticipo + 26 cuotas)</span></span></div>
+        <div class="finance-row interes-highlight"><span>💸 Interés incluido:</span><span>+${formatCLP(detalle26.interes)} sobre contado</span></div>
+      </div>
+      
+      <div class="policy-note">
+        ⚡ Política empresa: <strong>Cuota mínima garantizada $143.000</strong> · Si la cuota calculada es menor, se ajusta automáticamente.  
+        Los totales e intereses reflejan el ajuste cuando aplica.
+      </div>
+    `;
+  };
+
+  // Renderizado de tarjetas de productos según filtro
+  let productosFiltrados = [...rawProductsData];
+
+  const productsContainer = document.getElementById('productsContainer');
+  const searchInput = document.getElementById('searchInput');
+  const resultCountSpan = document.getElementById('resultCount');
+
+  // función para renderizar tarjetas
+  const renderCards = () => {
+    if (!productsContainer) return;
+    if (productosFiltrados.length === 0) {
+      productsContainer.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding: 3rem; background:#fff; border-radius: 2rem;">✨ No se encontraron productos. Intenta con otra palabra.</div>`;
+      resultCountSpan.innerText = `0 productos encontrados`;
+      return;
+    }
+    resultCountSpan.innerText = `${productosFiltrados.length} producto${productosFiltrados.length !== 1 ? 's' : ''} encontrado${productosFiltrados.length !== 1 ? 's' : ''}`;
+    
+    productsContainer.innerHTML = productosFiltrados.map(prod => `
+      <div class="product-card" data-product='${JSON.stringify(prod)}'>
+        <div class="card-content">
+          <div class="product-code">${prod.codigo}</div>
+          <div class="product-title">${prod.descripcion}</div>
+          <div class="product-category">📂 ${prod.categoria}</div>
+          <div class="price-contado">${formatCLP(prod.precioTotal)} <small>contado</small></div>
+          <button class="btn-simular" data-product='${JSON.stringify(prod)}'>📊 Ver plan de pagos</button>
+        </div>
+      </div>
+    `).join('');
+
+    // Eventos para cada botón / tarjeta (delegación)
+    document.querySelectorAll('.btn-simular').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const prodData = JSON.parse(btn.getAttribute('data-product'));
+        abrirModal(prodData);
+      });
+    });
+    document.querySelectorAll('.product-card').forEach(card => {
+      card.addEventListener('click', (e) => {
+        if (e.target.classList.contains('btn-simular')) return;
+        const prodStr = card.getAttribute('data-product');
+        if (prodStr) {
+          const prodData = JSON.parse(prodStr);
+          abrirModal(prodData);
+        }
+      });
+    });
+  };
+
+  // función de búsqueda flexible
+  const filterProducts = (query) => {
+    const term = query.trim().toLowerCase();
+    if (term === "") {
+      productosFiltrados = [...rawProductsData];
+    } else {
+      productosFiltrados = rawProductsData.filter(prod => 
+        prod.descripcion.toLowerCase().includes(term) ||
+        prod.codigo.toLowerCase().includes(term) ||
+        prod.categoria.toLowerCase().includes(term)
+      );
+    }
+    renderCards();
+  };
+
+  // Modal logic
+  const modalOverlay = document.getElementById('productModal');
+  const modalBody = document.getElementById('modalBody');
+  const modalTitle = document.getElementById('modalTitle');
+  const closeModalBtn = document.getElementById('closeModalBtn');
+
+  const abrirModal = (producto) => {
+    modalTitle.innerText = `${producto.codigo} · Simulación de crédito`;
+    modalBody.innerHTML = renderModalContent(producto);
+    modalOverlay.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  };
+
+  const cerrarModal = () => {
+    modalOverlay.classList.remove('active');
+    document.body.style.overflow = '';
+  };
+
+  // Eventos modal
+  closeModalBtn.addEventListener('click', cerrarModal);
+  modalOverlay.addEventListener('click', (e) => {
+    if (e.target === modalOverlay) cerrarModal();
+  });
+
+  // Buscador input
+  searchInput.addEventListener('input', (e) => {
+    filterProducts(e.target.value);
+  });
+
+  // Inicialización
+  renderCards();
+  // Mostrar política siempre visible (dentro del footer también)
+  const footerPolicy = document.createElement('div');
+  footerPolicy.className = 'policy-note';
+  footerPolicy.style.marginTop = '2rem';
+  footerPolicy.style.marginBottom = '1rem';
+  footerPolicy.innerHTML = '⚡ <strong>Política de cuota mínima garantizada $143.000</strong> — Aplicable a cualquier plazo (12, 18 o 26 meses) si la cuota original de tabla es inferior. Todos los cálculos reflejan el valor real a pagar.';
+  document.querySelector('.app-container').appendChild(footerPolicy);
+</script>
+</body>
+</html>
